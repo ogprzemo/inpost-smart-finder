@@ -41,7 +41,7 @@ Podczas tworzenia rozwiązania postawiłem na kilka kluczowych aspektów:
 1. **Sklonuj repozytorium:**
    ```bash
    git clone https://github.com/ogprzemo/inpost-smart-finder.git
-   cd inpost-quest
+   cd inpost-smart-finder
 
 2. **Zainstaluj zależności:**
    ```bash
