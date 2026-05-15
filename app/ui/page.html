@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InPost Smart Finder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); }
+        .inpost-yellow { background-color: #ffcc00; }
+        .details-panel { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+        .card-active .details-panel { max-height: 250px; }
+        .card-active .arrow-icon { transform: rotate(90deg); }
+    </style>
+</head>
+<body class="bg-[#f8fafc] text-slate-900 min-h-screen">
+
+    <div class="max-w-6xl mx-auto py-8 px-6">
+        <header class="flex flex-col md:flex-row justify-between items-center mb-12 gap-8">
+            <div class="flex items-center gap-5">
+                <div class="inpost-yellow p-4 rounded-2xl shadow-lg">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 7.5L12 12.5L3 7.5L12 2.5L21 7.5Z" stroke="black" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M3 7.5V16.5L12 21.5L21 16.5V7.5L12 12.5L3 7.5Z" stroke="black" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 21.5V12.5" stroke="black" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-4xl font-[900] tracking-tighter text-slate-900 leading-none">InPost Smart Finder</h1>
+                    <p class="text-slate-500 font-bold tracking-[0.2em] uppercase text-[10px] mt-1.5">Wyszukiwarka Punktów InPost</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+                <input type="text" id="searchInput" oninput="filterPoints()" placeholder="Szukaj miasta, ulicy lub ID..." class="px-6 py-4 rounded-2xl border-2 border-slate-200 focus:border-[#ffcc00] outline-none transition-all w-full sm:w-64 font-semibold text-sm shadow-sm" disabled>
+                <button onclick="loadPoints()" id="btn" class="inpost-yellow hover:bg-black hover:text-[#ffcc00] text-black font-black py-4 px-10 rounded-2xl transition-all duration-300 shadow-lg active:scale-95 uppercase text-sm tracking-widest whitespace-nowrap">
+                    Pobierz dane
+                </button>
+            </div>
+        </header>
+
+        <div id="hero-section" class="py-20 text-center relative overflow-hidden bg-slate-900 rounded-[40px] shadow-2xl mb-12">
+            <div class="relative z-10 px-6">
+                <h2 class="text-5xl md:text-6xl font-black text-white mb-6 tracking-tight">Znajdź swój <span class="text-[#ffcc00]">paczkomat</span></h2>
+                <p class="text-slate-400 text-lg max-w-2xl mx-auto mb-4 font-medium">Kliknij przycisk powyżej, aby załadować listę punktów InPost.</p>
+            </div>
+            <div class="absolute -bottom-10 -left-10 w-64 h-64 bg-[#ffcc00] opacity-10 rounded-full blur-3xl"></div>
+        </div>
+
+        <div id="loader" class="hidden flex flex-col items-center py-24">
+            <div class="w-16 h-16 border-[6px] border-[#ffcc00] border-t-transparent rounded-full animate-spin"></div>
+            <p class="mt-6 font-black text-slate-400 uppercase tracking-[0.4em] text-[10px]">Pobieranie danych z InPost...</p>
+        </div>
+
+        <div id="points-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+    </div>
+
+    <script>
+        let allPointsData = [];
+
+        function toggleCard(cardElement) {
+            cardElement.classList.toggle('card-active');
+        }
+
+        async function loadPoints() {
+            const btn = document.getElementById('btn');
+            const loader = document.getElementById('loader');
+            const container = document.getElementById('points-container');
+            const hero = document.getElementById('hero-section');
+            const searchInput = document.getElementById('searchInput');
+
+            btn.disabled = true;
+            loader.classList.remove('hidden');
+            if(hero) hero.classList.add('hidden');
+            container.innerHTML = '';
+
+            try {
+                const res = await fetch("/points/external-points");
+                const data = await res.json();
+                allPointsData = data.items;
+
+                loader.classList.add('hidden');
+                searchInput.disabled = false;
+                renderPoints(allPointsData);
+
+            } catch (error) {
+                container.innerHTML = `<div class="col-span-full text-red-500 text-center font-bold">Błąd serwera.</div>`;
+                loader.classList.add('hidden');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function filterPoints() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allPointsData.filter(p =>
+                p.name.toLowerCase().includes(query) ||
+                p.address_details.city.toLowerCase().includes(query) ||
+                p.address_details.street.toLowerCase().includes(query)
+            );
+            renderPoints(filtered);
+        }
+
+        function renderPoints(points) {
+            const container = document.getElementById('points-container');
+            container.innerHTML = '';
+
+            if (points.length === 0) {
+                container.innerHTML = `<p class="col-span-full text-center text-slate-400 font-bold py-10">Nie znaleziono punktów pasujących do wyszukiwania.</p>`;
+                return;
+            }
+
+            points.slice(0, 30).forEach(point => {
+                const status = point.status.toLowerCase();
+                let statusClass, dotClass, isPulse = false, statusPL = "NIEZNANY";
+
+                if (status === 'operating') {
+                    statusClass = 'text-green-600'; dotClass = 'bg-green-500'; isPulse = true; statusPL = "AKTYWNY";
+                } else if (status === 'created') {
+                    statusClass = 'text-yellow-600'; dotClass = 'bg-yellow-500'; statusPL = "W BUDOWIE";
+                } else {
+                    statusClass = 'text-red-500'; dotClass = 'bg-red-500'; statusPL = "WYŁĄCZONY";
+                }
+
+                const card = `
+                    <div onclick="toggleCard(this)" class="glass border border-white p-7 rounded-[32px] shadow-xl hover:shadow-yellow-200/50 transition-all duration-500 group relative cursor-pointer">
+                        <div class="flex justify-between items-center mb-6">
+                            <span class="bg-black text-[#ffcc00] text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest">${point.name}</span>
+                            <div class="flex items-center text-[10px] font-black ${statusClass} uppercase tracking-wider">
+                                <span class="w-2 h-2 ${dotClass} rounded-full mr-2 ${isPulse ? 'animate-pulse' : ''}"></span>
+                                ${statusPL}
+                            </div>
+                        </div>
+
+                        <h3 class="text-2xl font-black text-slate-800 mb-1 leading-tight group-hover:text-yellow-600 transition-colors">${point.address_details.city}</h3>
+                        <p class="text-slate-500 font-medium text-sm">${point.address_details.street} ${point.address_details.building_number || ''}</p>
+
+                        <div class="details-panel mt-4 pt-4 border-t border-slate-100">
+                            <div class="grid grid-cols-1 gap-3">
+                                <div>
+                                    <span class="text-slate-400 uppercase text-[9px] font-black block mb-1">Lokalizacja:</span>
+                                    <p class="text-xs text-slate-600 font-medium italic">"${point.location_description || 'Brak opisu'}"</p>
+                                </div>
+                                <div>
+                                    <span class="text-slate-400 uppercase text-[9px] font-black block mb-1">Kod pocztowy:</span>
+                                    <p class="text-xs text-slate-600 font-semibold">${point.address_details.post_code}</p>
+                                </div>
+                                <div>
+                                    <span class="text-slate-400 uppercase text-[9px] font-black block mb-1">Płatność:</span>
+                                    <p class="text-[10px] text-slate-500">${point.payment_point_descr || 'Karta / Aplikacja'}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 pt-4 border-t border-slate-100 flex items-end justify-between">
+                            <div>
+                                <p class="text-[9px] text-slate-400 uppercase font-black tracking-widest mb-1">Typ punktu</p>
+                                <p class="text-xs text-slate-600 font-semibold italic">${point.type[0] === 'parcel_locker' ? 'Paczkomat' : 'Punkt'}</p>
+                            </div>
+                            <div class="arrow-icon w-10 h-10 bg-slate-900 rounded-2xl flex items-center justify-center group-hover:bg-[#ffcc00] transition-all duration-300 shadow-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white group-hover:text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', card);
+            });
+        }
+    </script>
+</body>
+</html>

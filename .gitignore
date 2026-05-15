@@ -1,0 +1,37 @@
+# Środowisko wirtualne (Virtual Environment)
+venv/
+.venv/
+env/
+ENV/
+
+# Pliki tymczasowe Pythona
+**/__pycache__/
+*.py[cod]
+*$py.class
+
+# Pliki środowiskowe i klucze (Nigdy nie wrzucaj .env na GitHub!)
+.env
+.env.local
+
+# IDE - PyCharm
+.idea/
+*.iml
+
+# IDE - VS Code
+.vscode/
+*.code-workspace
+
+# Logi i pliki tymczasowe
+*.log
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Systemowe pliki (Mac/Windows)
+.DS_Store
+Thumbs.db
+
+# Pliki instalacyjne i dystrybucyjne
+build/
+dist/
+*.egg-info/
