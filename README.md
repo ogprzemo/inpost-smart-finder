@@ -56,3 +56,10 @@ Podczas tworzenia rozwiązania postawiłem na kilka kluczowych aspektów:
    ```
    http://127.0.0.1:8000/ui/page.html
     ```
+
+
+
+<img width="1167" height="1195" alt="Zrzut ekranu 2026-05-15 140634" src="https://github.com/user-attachments/assets/659f8650-4f22-49b1-8448-b42051e90be9" />
+<img width="2557" height="1281" alt="Zrzut ekranu 2026-05-15 160021" src="https://github.com/user-attachments/assets/01a8ebc0-5528-4ea0-8871-97f394aa65f9" />
+<img width="2546" height="1281" alt="Zrzut ekranu 2026-05-15 160101" src="https://github.com/user-attachments/assets/67c254a3-524d-408f-acb1-973e6a269df2" />
+<img width="2559" height="1289" alt="Zrzut ekranu 2026-05-15 160050" src="https://github.com/user-attachments/assets/320e97d0-e3a7-450d-b685-03e8d06a7f96" />
