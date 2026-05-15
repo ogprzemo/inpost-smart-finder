@@ -62,3 +62,5 @@ Podczas tworzenia rozwiązania postawiłem na kilka kluczowych aspektów:
 <img width="2559" height="1289" alt="Zrzut ekranu 2026-05-15 160050" src="https://github.com/user-attachments/assets/429e61c0-ea1f-4adb-a943-4982fd1546de" />
 <img width="2546" height="1281" alt="Zrzut ekranu 2026-05-15 160101" src="https://github.com/user-attachments/assets/3deddc99-1576-486d-a9a7-43ec645e015f" />
 <img width="2559" height="1290" alt="Zrzut ekranu 2026-05-15 160231" src="https://github.com/user-attachments/assets/bd02d8b6-e95a-4ed1-8bb1-79b64a4c7e17" />
+<img width="2559" height="1286" alt="Zrzut ekranu 2026-05-15 160449" src="https://github.com/user-attachments/assets/13bdf37b-068c-431c-9348-88193fe77b05" />
+
