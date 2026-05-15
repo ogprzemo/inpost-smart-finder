@@ -42,3 +42,17 @@ Podczas tworzenia rozwiązania postawiłem na kilka kluczowych aspektów:
    ```bash
    git clone https://github.com/ogprzemo/inpost-smart-finder.git
    cd inpost-quest
+
+2. **Zainstaluj zależności:**
+   ```bash
+    pip install -r requirements.txt
+   
+3. **Uruchom aplikację:**
+   ```bash
+    uvicorn main:app --reload
+   ```
+   
+4. **Otwórz przeglądarkę i przejdź do:**
+   ```
+   http://127.0.0.1:8000/ui/page.html
+    ```
